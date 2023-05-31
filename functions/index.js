@@ -1,25 +1,11 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * const {onCall} = require("firebase-functions/v2/https");
- * const {onDocumentWritten} = require("firebase-functions/v2/firestore");
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+const functions = require("firebase-functions");
+const { Telegraf } = require("telegraf");
+const cron = require("node-cron");
 
-// const {onRequest} = require("firebase-functions/v2/https");
-// const logger = require("firebase-functions/logger");
+const { AccuWeather, read_sample_data } = require("./modules/weather_api.js");
 
-// Create and deploy your first functions
-// https://firebase.google.com/docs/functions/get-started
-
-// exports.helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
-
-const functions = require("firebase-functions")
-const {Telegraf} = require("telegraf")
+const weatherAPI = new AccuWeather(functions.config().accuweather.apikey);
+// const sampleData = read_sample_data();
 
 const bot = new Telegraf(functions.config().telegram.token, {
     telegram: { webhookReply: true },
@@ -45,8 +31,33 @@ const bot = new Telegraf(functions.config().telegram.token, {
 // 	})
 // })
 
-bot.start((ctx) => ctx.reply("Welcome!"))
-bot.hears('hi', (ctx) => ctx.reply('Hey there!'))
+bot.start((ctx) => {ctx.reply("Welcome!")});
+
+// bot.start((ctx) => ctx.reply("Welcome!"));
+// bot.hears('hi', (ctx) => ctx.reply('Hey there!'))
+
+let weatherJob = null;
+
+bot.command("startWeather", (ctx) => {
+    const chatId = ctx.chat.id;
+    console.log("Starting weekly reminders");
+    ctx.reply("Starting weekly reminders on Tuesday at 4pm");
+    weatherJob = cron.schedule("0 16 * * TUE", () => {
+        bot.telegram.sendMessage(chatId, "Hello! It's time to submit your weekly report!");
+    });
+});
+
+
+bot.command("stopWeather", (ctx) => {
+    const chatId = ctx.chat.id;
+    if (weatherJob) {
+        weatherJob.stop();
+        ctx.reply("Weekly reminders stopped");
+    } else {
+        ctx.reply("Weekly reminders not started");
+    }
+});
+
 
 exports.echoBot = functions.https.onRequest(
     (req, res) => bot.handleUpdate(req.body, res)
