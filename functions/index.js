@@ -6,6 +6,7 @@ const fs = require("fs");
 const { AccuWeather } = require("./modules/weather_api.js");
 
 const weatherAPI = new AccuWeather(functions.config().accuweather.apikey);
+const chatId = -817325123;
 
 const bot = new Telegraf(functions.config().telegram.token, {
     telegram: { webhookReply: true },
@@ -13,45 +14,72 @@ const bot = new Telegraf(functions.config().telegram.token, {
 
 bot.start((ctx) => {ctx.reply("Welcome!")});
 
-var weatherJob;
+let weatherJobs = [];
 
 bot.command("startweather", async (ctx) => {
     ctx.reply("Starting scheduled weather reports");
-    // Read from AccuWeather API
-    // const data = await weatherAPI.getCurrentConditions();
-
     // Read sample data from sample.json (for testing to avoid exceeding API call limit)
-    const jsonString = fs.readFileSync("modules/sample.json", "utf8");
-    const data = JSON.parse(jsonString);
+    // const jsonString = fs.readFileSync("modules/sample.json", "utf8");
+    // const data = JSON.parse(jsonString);
 
-    // Setup test cron job to send every minute
-    weatherJob = cron.schedule("* * * * *", () => {
-        bot.telegram.sendMessage(-817325123, data.WeatherText);
+    const weatherJobTimings = [
+        // "* * * * *",
+        "0 17 * * TUE",
+        "0 18 * * TUE",
+        "0 9 * * SAT",
+        "0 10 * * SAT"
+    ];
+
+    weatherJobTimings.forEach((timing) => {
+        weatherJobs.push(cron.schedule(timing, async () => {
+            // Read from AccuWeather API
+            let data = await weatherAPI.getCurrentConditions();
+            data = data[0];
+
+            let precip1Hr = data.Precip1hr.Metric.Value;
+            let precip1HrStatus = null;
+
+            if (precip1Hr < 0.1) {
+                precip1HrStatus = false;
+            } else if (precip1Hr <= 2.5) {
+                precip1HrStatus = "light rain";
+            } else if (precip1Hr <= 7.6) {
+                precip1HrStatus = "moderate rain";
+            } else {
+                precip1HrStatus = "heavy rain";
+            }
+
+            if (data.HasPrecipitation && precip1Hr) { 
+                bot.telegram.sendMessage(chatId, `Currently raining at Serangoon, with ${precip1HrStatus} over the past hour`);
+            } else if (data.HasPrecipitation && !precip1Hr) {
+                bot.telegram.sendMessage(chatId, `Currently raining at Serangoon`);
+            } else if (!data.HasPrecipitation && precip1Hr) {
+                bot.telegram.sendMessage(chatId, `Currently not raining at Serangoon, but ${precip1HrStatus} over the past hour. Floor may be wet!`);
+            } else {
+                bot.telegram.sendMessage(chatId, `All clear at Serangoon!`);
+            }
+        }));
     });
-
-    // Setup cron job to send every Tuesday at 5:30pm
-    // weatherJob = cron.schedule("30 17 * * TUE", () => {
-    //     console.log("Sending weekly reminder");
-    //     bot.telegram.sendMessage(chatId, data.WeatherText);
-    // });
 });
 
 
 bot.command("stopweather", (ctx) => {
-    if (weatherJob) {
-        weatherJob.stop();
+    if (weatherJobs) {
+        weatherJobs.forEach((job) => {
+            job.stop();
+        });
         ctx.reply("Stopping scheduled weather reports");
     } else {
         ctx.reply("Scheduled weather reports not started");
     }
 });
 
-var tueAttendanceJob;
-var satAttendanceJob;
-var testAttendanceJob;
+
+let tueAttendanceJob;
+let satAttendanceJob;
+let testAttendanceJob;
 
 bot.command("startattendance", (ctx) => {
-    ctx.reply("Starting scheduled attendance poll");
     tueAttendanceJob = cron.schedule("0 9 * * MON", () => {
         const pollQuestion = "Tues Workout";
         const pollOptions = ["Yes@Tues", "Yes@Wed", "OTOT", "Busy"];

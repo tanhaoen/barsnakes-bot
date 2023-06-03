@@ -187,7 +187,7 @@
     },
     "Precip1hr": {
         "Metric": {
-            "Value": 0.0,
+            "Value": 2.9,
             "Unit": "mm",
             "UnitType": 3
         },
