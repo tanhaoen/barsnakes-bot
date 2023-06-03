@@ -13,15 +13,12 @@ const bot = new Telegraf(functions.config().telegram.token, {
 
 bot.start((ctx) => {ctx.reply("Welcome!")});
 
-let weatherJob = null;
+var weatherJob;
 
 bot.command("startweather", async (ctx) => {
-    ctx.reply("Starting CRON job for every minute");
-    // const chatId = ctx.chat.id;
-    // console.log("Starting weekly reminders");
+    ctx.reply("Starting scheduled weather reports");
     // Read from AccuWeather API
     // const data = await weatherAPI.getCurrentConditions();
-    // bot.telegram.sendMessage(-817325123, data[0].WeatherText);
 
     // Read sample data from sample.json (for testing to avoid exceeding API call limit)
     const jsonString = fs.readFileSync("modules/sample.json", "utf8");
@@ -43,13 +40,67 @@ bot.command("startweather", async (ctx) => {
 bot.command("stopweather", (ctx) => {
     if (weatherJob) {
         weatherJob.stop();
-        ctx.reply("Stopping CRON job");
+        ctx.reply("Stopping scheduled weather reports");
     } else {
-        ctx.reply("CRON job not started");
+        ctx.reply("Scheduled weather reports not started");
+    }
+});
+
+var tueAttendanceJob;
+var satAttendanceJob;
+var testAttendanceJob;
+
+bot.command("startattendance", (ctx) => {
+    ctx.reply("Starting scheduled attendance poll");
+    tueAttendanceJob = cron.schedule("0 9 * * MON", () => {
+        const pollQuestion = "Tues Workout";
+        const pollOptions = ["Yes@Tues", "Yes@Wed", "OTOT", "Busy"];
+
+        bot.telegram.sendPoll(-817325123, pollQuestion, pollOptions, {
+            is_anonymous: false
+        });
+    });
+
+    satAttendanceJob = cron.schedule("0 9 * * FRI", () => {
+        const pollQuestion = "Sat Workout";
+        const pollOptions = ["Yes", "OTOT", "Busy"];
+
+        bot.telegram.sendPoll(-817325123, pollQuestion, pollOptions, {
+            is_anonymous: false
+        });
+    });
+
+    // testAttendanceJob = cron.schedule("* * * * *", () => {
+    //     const pollQuestion = "Test Poll";
+    //     const pollOptions = ["Yes", "No"];
+
+    //     bot.telegram.sendPoll(-817325123, pollQuestion, pollOptions, {
+    //         is_anonymous: false
+    //     });
+    // }
+    // );
+});
+
+
+bot.command("stopattendance", (ctx) => {
+    if (tueAttendanceJob) {
+        tueAttendanceJob.stop();
+        ctx.reply("Stopping Tuesday attendance poll");
+    }
+    if (satAttendanceJob) {
+        satAttendanceJob.stop();
+        ctx.reply("Stopping Saturday attendance poll");
+    }
+    if (testAttendanceJob) {
+        testAttendanceJob.stop();
+        ctx.reply("Stopping test attendance poll");
+    }
+    if (!tueAttendanceJob && !satAttendanceJob) {
+        ctx.reply("No attendance polls running");
     }
 });
 
 
-exports.echoBot = functions.https.onRequest(
+exports.barsnakesBot = functions.https.onRequest(
     (req, res) => bot.handleUpdate(req.body, res)
 )
