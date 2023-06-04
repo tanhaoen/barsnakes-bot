@@ -5,10 +5,10 @@ const fs = require("fs");
 
 const { AccuWeather } = require("./modules/weather_api.js");
 
-const weatherAPI = new AccuWeather(functions.config().accuweather.apikey);
+const weatherAPI = new AccuWeather(process.env.ACCUWEATHER_API_KEY);
 const chatId = -817325123;
 
-const bot = new Telegraf(functions.config().telegram.token, {
+const bot = new Telegraf(process.env.BOT_TOKEN, {
     telegram: { webhookReply: true },
 })
 
