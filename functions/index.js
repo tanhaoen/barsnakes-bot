@@ -18,6 +18,7 @@ let weatherJobs = [];
 
 bot.command("startweather", async (ctx) => {
     ctx.reply("Starting scheduled weather reports");
+    console.log("Starting scheduled weather report");
     // Read sample data from sample.json (for testing to avoid exceeding API call limit)
     // const jsonString = fs.readFileSync("modules/sample.json", "utf8");
     // const data = JSON.parse(jsonString);
@@ -68,8 +69,10 @@ bot.command("stopweather", (ctx) => {
         weatherJobs.forEach((job) => {
             job.stop();
         });
+        console.log("Stopping scheduled weather report");
         ctx.reply("Stopping scheduled weather reports");
     } else {
+        console.log("Scheduled weather reports not started");
         ctx.reply("Scheduled weather reports not started");
     }
 });
@@ -80,7 +83,7 @@ let satAttendanceJob;
 let testAttendanceJob;
 
 bot.command("startattendance", (ctx) => {
-    tueAttendanceJob = cron.schedule("0 9 * * MON", () => {
+    tueAttendanceJob = cron.schedule("0 18 * * MON", () => {
         const pollQuestion = "Tues Workout";
         const pollOptions = ["Yes@Tues", "Yes@Wed", "OTOT", "Busy"];
 
@@ -89,7 +92,7 @@ bot.command("startattendance", (ctx) => {
         });
     });
 
-    satAttendanceJob = cron.schedule("0 9 * * FRI", () => {
+    satAttendanceJob = cron.schedule("0 18 * * FRI", () => {
         const pollQuestion = "Sat Workout";
         const pollOptions = ["Yes", "OTOT", "Busy"];
 
@@ -126,6 +129,16 @@ bot.command("stopattendance", (ctx) => {
     if (!tueAttendanceJob && !satAttendanceJob) {
         ctx.reply("No attendance polls running");
     }
+});
+
+
+bot.command("feedback", (ctx) => {
+    ctx.reply("What improvements or suggestions do you have?");
+    bot.on("text", (ctx) => {
+        const { text } = ctx.message;
+        ctx.reply("Thank you for your feedback!");
+        bot.telegram.sendMessage('tanhaoen', text);
+    });
 });
 
 
