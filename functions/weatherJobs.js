@@ -35,8 +35,7 @@ function startWeatherJobs(bot, chatId, ctx) {
             let data = await weatherAPI.getCurrentConditions();
             console.log('Weather job is triggered');
             data = data[0];
-            // console.log(data);
-
+            
             let precip1Hr = data.Precip1hr.Metric.Value;
             let precip1HrStatus = null;
 
@@ -50,15 +49,28 @@ function startWeatherJobs(bot, chatId, ctx) {
                 precip1HrStatus = "heavy rain";
             }
 
-            if (data.HasPrecipitation && precip1Hr) { 
-                bot.telegram.sendMessage(chatId, `Currently raining at Serangoon, with ${precip1HrStatus} over the past hour`);
+            let msg = "";
+            let rainFlag = false;
+
+            if (data.HasPrecipitation && precip1Hr) {
+                msg += `Currently raining at Serangoon, with ${precip1HrStatus} over the past hour`;
+                rainFlag = true;
             } else if (data.HasPrecipitation && !precip1Hr) {
-                bot.telegram.sendMessage(chatId, `Currently raining at Serangoon`);
+                msg += `Currently raining at Serangoon`;
+                rainFlag = true;
             } else if (!data.HasPrecipitation && precip1Hr) {
-                bot.telegram.sendMessage(chatId, `Currently not raining at Serangoon, but ${precip1HrStatus} over the past hour. Floor may be wet!`);
+                msg += `Currently not raining at Serangoon, but ${precip1HrStatus} over the past hour. Floor may be wet!`;
             } else {
-                bot.telegram.sendMessage(chatId, `All clear at Serangoon!`);
+                msg += `No rain at Serangoon!`;
             }
+
+            if (data.IsDayTime && !rainFlag) {
+                msg += `Temperature is ${data.Temperature.Metric.Value}`
+                msg += `UV Index is ${data.UVIndexText.toLowerCase()}`;
+            }
+
+            bot.telegram.sendMessage(chatId, msg)
+
         }));
     });
 
