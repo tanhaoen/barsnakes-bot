@@ -9,19 +9,13 @@ const { startWeatherJobs, stopWeatherJobs } = require('./weatherJobs');
 
 let chatId = process.env.CHAT_ID;
 
-if (typeof chatId === "string") {
-    const parsedChatId = parseInt(chatId, 10);
-    if (!isNaN(parsedChatId)) {
-        chatId = parsedChatId;
-    }
+if (typeof chatId === "string" && !isNaN(chatId)) {
+    chatId = parseInt(chatId);
 }
 
 let adminGroupId = process.env.ADMIN_GROUP_ID;
-if (typeof adminGroupId === "string") {
-    const parsedAdminGroupId = parseInt(chatId, 10);
-    if (!isNaN(parsedAdminGroupId)) {
-        adminGroupId = parsedAdminGroupId;
-    }
+if (typeof adminGroupId === "string" && !isNaN(adminGroupId)) {
+    adminGroupId = parseInt(adminGroupId);
 }
 
 const bot = new Telegraf(process.env.BOT_TOKEN, {
