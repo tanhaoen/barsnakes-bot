@@ -7,11 +7,11 @@ const { startAttendancePolls, stopAttendancePolls } = require('./attendanceJobs'
 const { startWeatherJobs, stopWeatherJobs } = require('./weatherJobs');
 
 
-const chatId = process.env.CHAT_ID;
-console.log(chatId, typeof chatId);
+const chatId = parseInt(process.env.CHAT_ID);
+console.log("chatId type is:", typeof chatId);
 
-const adminGroupId = process.env.ADMIN_GROUP_ID;
-console.log(adminGroupId, typeof adminGroupId);
+const adminGroupId = parseInt(process.env.ADMIN_GROUP_ID);
+console.log("adminGroupId type is:", typeof adminGroupId);
 
 const bot = new Telegraf(process.env.BOT_TOKEN, {
     telegram: { webhookReply: true },
