@@ -8,7 +8,7 @@ const { startWeatherJobs, stopWeatherJobs } = require('./weatherJobs');
 
 
 const chatId = parseInt(process.env.CHAT_ID);
-const feedbackGroupId = parseInt(process.env.FEEDBACK_GROUP_ID);
+const adminGroupId = parseInt(process.env.ADMIN_GROUP_ID);
 
 const bot = new Telegraf(process.env.BOT_TOKEN, {
     telegram: { webhookReply: true },
@@ -42,7 +42,7 @@ bot.command("feedback", (ctx) => {
     bot.on("text", (ctx) => {
         const { text } = ctx.message;
         ctx.reply("Thank you for your feedback!");
-        bot.telegram.sendMessage(feedbackGroupId, text);
+        bot.telegram.sendMessage(adminGroupId, text);
     });
 });
 
