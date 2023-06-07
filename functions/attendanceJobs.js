@@ -24,7 +24,7 @@ function startAttendancePolls(bot, chatId, ctx) {
         {
             cron: '0 18 * * MON',
             question: 'Tuesday Weakday',
-            options: ['Yes@Tues', 'Yes@Wed', 'OTOT', 'Busy'],
+            options: ['Yes@Tues', 'Yes@Wed', 'OTOT', 'No@Busy'],
         },
         {
             cron: '0 18 * * FRI',

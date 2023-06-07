@@ -35,7 +35,7 @@ function startWeatherJobs(bot, chatId, ctx) {
             let data = await weatherAPI.getCurrentConditions();
             console.log('Weather job is triggered');
             data = data[0];
-            
+
             let precip1Hr = data.Precip1hr.Metric.Value;
             let precip1HrStatus = null;
 
