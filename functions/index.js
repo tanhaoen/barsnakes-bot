@@ -7,12 +7,12 @@ const { startAttendancePolls, stopAttendancePolls } = require('./attendanceJobs'
 const { startWeatherJobs, stopWeatherJobs } = require('./weatherJobs');
 
 
-const chatId = process.env.CHAT_ID;
+let chatId = process.env.CHAT_ID;
 if (typeof chatId !== "number") {
     chatId = parseInt(chatId);
 }
 
-const adminGroupId = process.env.ADMIN_GROUP_ID;
+let adminGroupId = process.env.ADMIN_GROUP_ID;
 if (typeof adminGroupId !== "number") {
     adminGroupId = parseInt(adminGroupId);
 }
