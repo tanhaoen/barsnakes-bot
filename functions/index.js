@@ -7,10 +7,10 @@ const { startAttendancePolls, stopAttendancePolls } = require('./attendanceJobs'
 const { startWeatherJobs, stopWeatherJobs } = require('./weatherJobs');
 
 
-let chatId = process.env.CHAT_ID;
+const chatId = process.env.CHAT_ID;
 console.log(chatId, typeof chatId);
 
-let adminGroupId = process.env.ADMIN_GROUP_ID;
+const adminGroupId = process.env.ADMIN_GROUP_ID;
 console.log(adminGroupId, typeof adminGroupId);
 
 const bot = new Telegraf(process.env.BOT_TOKEN, {
