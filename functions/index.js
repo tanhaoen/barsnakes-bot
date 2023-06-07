@@ -6,16 +6,6 @@ const fs = require("fs");
 const { startAttendancePolls, stopAttendancePolls } = require('./attendanceJobs');
 const { startWeatherJobs, stopWeatherJobs } = require('./weatherJobs');
 
-
-const chatId = process.env.CHAT_ID;
-console.log("chatId is", chatId);
-
-const adminGroupId = process.env.ADMIN_GROUP_ID;
-console.log("adminGroupId is", adminGroupId);
-console.log("adminGroupId type is", typeof adminGroupId);
-
-console.log("bot token is", process.env.BOT_TOKEN);
-
 const bot = new Telegraf(process.env.BOT_TOKEN, {
     telegram: { webhookReply: true },
 })
@@ -24,8 +14,8 @@ bot.start((ctx) => {ctx.reply("Welcome!")});
 
 
 bot.command("startweather", async (ctx) => {
-    console.log("Chat ID used is: ", chatId);
-    startWeatherJobs(bot, chatId, ctx);
+    console.log("Chat ID used is: ", process.env.CHAT_ID);
+    startWeatherJobs(bot, process.env.CHAT_ID, ctx);
 });
 
 
@@ -35,8 +25,8 @@ bot.command("stopweather", (ctx) => {
 
 
 bot.command('startattendance', (ctx) => {
-    console.log("Chat ID used is: ", chatId);
-    startAttendancePolls(bot, chatId, ctx);
+    console.log("Chat ID used is: ", process.env.CHAT_ID);
+    startAttendancePolls(bot, process.env.CHAT_ID, ctx);
 });
 
 
@@ -51,8 +41,8 @@ bot.command("feedback", (ctx) => {
         const { text } = ctx.message;
         ctx.reply("Thank you for your feedback!");
         console.log("Feedback received: ", text);
-        console.log("Chat ID used is: ", chatId);
-        bot.telegram.sendMessage(adminGroupId, text);
+        console.log("Chat ID used is: ", process.env.CHAT_ID);
+        bot.telegram.sendMessage(process.env.ADMIN_GROUP_ID, text);
     });
 });
 
