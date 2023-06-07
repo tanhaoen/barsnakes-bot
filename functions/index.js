@@ -18,6 +18,7 @@ bot.start((ctx) => {ctx.reply("Welcome!")});
 
 
 bot.command("startweather", async (ctx) => {
+    console.log("Chat ID used is: ", chatId);
     startWeatherJobs(bot, chatId, ctx);
 });
 
@@ -28,6 +29,7 @@ bot.command("stopweather", (ctx) => {
 
 
 bot.command('startattendance', (ctx) => {
+    console.log("Chat ID used is: ", chatId);
     startAttendancePolls(bot, chatId, ctx);
 });
 
@@ -42,6 +44,8 @@ bot.command("feedback", (ctx) => {
     bot.on("text", (ctx) => {
         const { text } = ctx.message;
         ctx.reply("Thank you for your feedback!");
+        console.log("Feedback received: ", text);
+        console.log("Chat ID used is: ", chatId);
         bot.telegram.sendMessage(adminGroupId, text);
     });
 });
