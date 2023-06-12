@@ -8,10 +8,6 @@ const fs = require("fs");
 const { startAttendancePolls, stopAttendancePolls } = require('./attendanceJobs');
 const { startWeatherJobs, stopWeatherJobs } = require('./weatherJobs');
 
-console.log(process.env);
-console.log("Chat_ID is: ", process.env.CHAT_ID);
-console.log("Admin_ID is: ", process.env.ADMIN_GROUP_ID);
-
 const bot = new Telegraf(process.env.BOT_TOKEN, {
     telegram: { webhookReply: true },
 })

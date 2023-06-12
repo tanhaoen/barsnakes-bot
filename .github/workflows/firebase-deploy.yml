@@ -1,12 +1,5 @@
 name: Deploy Cloud Functions
 
-env:
-  ACCUWEATHER_API_KEY: ${{ secrets.ACCUWEATHER_API_KEY }}
-  ADMIN_GROUP_ID: ${{ secrets.ADMIN_GROUP_ID }}
-  BOT_TOKEN: ${{ secrets.BOT_TOKEN }}
-  CHAT_ID: ${{ secrets.CHAT_ID }}
-  FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-
 on:
   workflow_dispatch:
   push:
