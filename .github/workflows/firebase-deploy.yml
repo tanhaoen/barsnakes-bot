@@ -5,11 +5,11 @@ on:
   push:
     branches:
       - master
+      - test
     paths:
       - 'functions/**'
 jobs:
-  build_and_deploy:
-    environment: production
+  common_steps:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -22,9 +22,51 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/functions/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: .common_steps
       - name: Build Cloud Functions
         run: cd functions && npm ci
       - name: Create SA key
         run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > $HOME/gcloud.json
+
+  deploy_prod:
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: .common_steps
       - name: Deploy Cloud Functions
         run: export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json && npx firebase-tools deploy --only functions:barsnakesBot --json
+
+  deploy_test:
+    needs: build
+    if: github.ref == 'refs/heads/test'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: .common_steps
+      - name: Deploy Cloud Functions
+        run: export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json && npx firebase-tools deploy --only functions:testBarsnakesBot --json
+
+  # build_and_deploy:
+  #   environment: production
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v3
+  #     - uses: actions/setup-node@v3
+  #       with:
+  #         node-version: 18.x
+  #     - uses: actions/cache@v3
+  #       with:
+  #         path: ~/.npm
+  #         key: ${{ runner.os }}-node-${{ hashFiles('**/functions/package-lock.json') }}
+  #         restore-keys: |
+  #           ${{ runner.os }}-node-
+  #     - name: Build Cloud Functions
+  #       run: cd functions && npm ci
+  #     - name: Create SA key
+  #       run: echo '${{ secrets.FIREBASE_SERVICE_ACCOUNT }}' > $HOME/gcloud.json
+  #     - name: Deploy Cloud Functions
+  #       run: export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json && npx firebase-tools deploy --only functions:barsnakesBot --json
