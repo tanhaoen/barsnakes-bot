@@ -9,7 +9,7 @@ on:
     paths:
       - 'functions/**'
 jobs:
-  common_steps:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -22,11 +22,6 @@ jobs:
           key: ${{ runner.os }}-node-${{ hashFiles('**/functions/package-lock.json') }}
           restore-keys: |
             ${{ runner.os }}-node-
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: .common_steps
       - name: Build Cloud Functions
         run: cd functions && npm ci
       - name: Create SA key
@@ -37,7 +32,16 @@ jobs:
     if: github.ref == 'refs/heads/master'
     runs-on: ubuntu-latest
     steps:
-      - uses: .common_steps
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/functions/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Deploy Cloud Functions
         run: export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json && npx firebase-tools deploy --only functions:barsnakesBot --json
 
@@ -46,7 +50,16 @@ jobs:
     if: github.ref == 'refs/heads/test'
     runs-on: ubuntu-latest
     steps:
-      - uses: .common_steps
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+      - uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/functions/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
       - name: Deploy Cloud Functions
         run: export GOOGLE_APPLICATION_CREDENTIALS=$HOME/gcloud.json && npx firebase-tools deploy --only functions:testBarsnakesBot --json
 
