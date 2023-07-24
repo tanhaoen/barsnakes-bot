@@ -53,22 +53,34 @@ async function weatherReport (bot, chatId) {
 }
 
 
-const tueWeatherReport1 = onSchedule('0 17 * * TUE', async (event) => {
+const tueWeatherReport1 = onSchedule({
+    schedule: '0 17 * * TUE',
+    timeZone: 'Asia/Singapore',
+    }, async (event) => {
     console.log("Preparing to send Tuesday weather report 1");
     await weatherReport(bot, process.env.CHAT_ID);
 });
 
-const tueWeatherReport2 = onSchedule('0 18 * * TUE', async (event) => {
+const tueWeatherReport2 = onSchedule({
+    schedule: '0 18 * * TUE',
+    timeZone: 'Asia/Singapore',
+    }, async (event) => {
     console.log("Preparing to send Tuesday weather report 2");
     await weatherReport(bot, process.env.CHAT_ID);
 });
 
-const satWeatherReport1 = onSchedule('0 9 * * SAT', async (event) => {
+const satWeatherReport1 = onSchedule({
+    schedule: '0 9 * * SAT',
+    timeZone: 'Asia/Singapore',
+    }, async (event) => {
     console.log("Preparing to send Saturday weather report 1");
     await weatherReport(bot, process.env.CHAT_ID);
 });
 
-const satWeatherReport2 = onSchedule('0 10 * * SAT', async (event) => {
+const satWeatherReport2 = onSchedule({
+    schedule: '0 10 * * SAT',
+    timeZone: 'Asia/Singapore',
+    }, async (event) => {
     console.log("Preparing to send Saturday weather report 2");
     await weatherReport(bot, process.env.CHAT_ID);
 });
