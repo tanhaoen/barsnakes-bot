@@ -8,28 +8,14 @@ const bot = new Telegraf(process.env.BOT_TOKEN, {
     telegram: { webhookReply: true },
 })
 
-const tueAttendancePoll = onSchedule('0 18 * * MON', async (event) => {
-    console.log("Preparing to send Tuesday poll");
-    bot.telegram.sendPoll(process.env.CHAT_ID, 'Tuesday Weakday', ['Yes@Tues', 'Yes@Wed', 'OTOT', 'No@Busy'], {
-        is_anonymous: false,
-    });
-});
-
-const satAttendancePoll = onSchedule('0 18 * * FRI', async (event) => {
-    console.log("Preparing to send Saturday poll");
-    bot.telegram.sendPoll(process.env.CHAT_ID, 'Saturday Werk', ['Yes', 'OTOT', 'Nah'], {
-        is_anonymous: false,
-    });
-});
-
 const testAttendancePoll = onSchedule('* * * * *', async (event) => {
     console.log("Preparing to send test poll");
-    bot.telegram.sendPoll(process.env.CHAT_ID, 'Test Poll', ['Yes', 'No'], {
+    bot.telegram.sendPoll(process.env.TEST_CHAT_ID, 'Test Poll', ['Yes', 'No'], {
         is_anonymous: false,
     });
 });
 
-module.exports = { tueAttendancePoll, satAttendancePoll, testAttendancePoll };
+module.exports = { testAttendancePoll };
 
 // function startAttendancePolls(bot, chatId, ctx) {
 //     if (isPollsStarted) {

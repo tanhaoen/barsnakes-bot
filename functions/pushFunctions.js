@@ -18,8 +18,8 @@ bot.command("feedback", (ctx) => {
     });
 });
 
-const barsnakesBot = functions.https.onRequest(
+const testBarsnakesBot = functions.https.onRequest(
     (req, res) => bot.handleUpdate(req.body, res)
 )
 
-module.exports = { barsnakesBot };
+module.exports = { testBarsnakesBot };
