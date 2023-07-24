@@ -13,7 +13,7 @@ bot.command("feedback", (ctx) => {
         const { text } = ctx.message;
         ctx.reply("Thank you for your feedback!");
         console.log("Feedback received: ", text);
-        console.log("Chat ID used is: ", process.env.CHAT_ID);
+        console.log("Chat ID used is: ", process.env.TEST_CHAT_ID);
         bot.telegram.sendMessage(process.env.ADMIN_GROUP_ID, text);
     });
 });
